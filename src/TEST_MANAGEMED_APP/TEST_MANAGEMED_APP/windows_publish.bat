@@ -1,0 +1,1 @@
+dotnet publish -c Release -o E:/STORE_EXEC/TEST_MANAGEMED_APP -r win10-x64

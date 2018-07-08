@@ -1,11 +1,14 @@
-# Remote-Process-Manager-Library
+# Remote-Process-Manager-Library 
 
-The Remote Process Manager library provides the launch of a new processes on the remote computer
+
+The Remote Process Manager library provides the launch multiple asynchronous processes on the remote computer
  and provides information about their statuses. 
  
  Your can saving your output to a specified location 
  
+ ( NET CORE 2.1 + Visual Studio 2017 )
  
+  
  Example:
  
     [TestClass]
@@ -15,26 +18,26 @@ The Remote Process Manager library provides the launch of a new processes on the
         public static ExecuterManager executerManager = new ExecuterManager(); // Create container
 
         /// <summary>
-        ///    Process  exit collback function
+        ///    Process  exit callback function
         /// </summary>
-        /// <param name="TaskID"></param>
+        /// <param name="ProcessID"></param>
         /// <param name="TaskName"></param>
         /// <returns></returns>
-        public static bool OnProcessExiFunctiont(String TaskID, String TaskName)
+        public static bool OnProcessExiFunctiont(String ProcessID, String TaskName)
         {
-            Console.WriteLine($"TaskID: { TaskID} , Task Completed : {TaskName} , Task Container count {executerManager.Count()}");
+            Console.WriteLine($"ProcessID: { ProcessID} , Task Completed : {TaskName} , Task Container count {executerManager.Count()}");
             return true;
         }
 
         /// <summary>
         ///  Process callback function 
         /// </summary>
-        /// <param name="TaskID"></param>
+        /// <param name="ProcessID"></param>
         /// <param name="line"></param>
         /// <returns></returns>
-        public static bool OnProcessCallBack(String TaskID, String line)
+        public static bool OnProcessCallBack(String ProcessID, String line)
         {
-           Console.WriteLine($"TaskID {TaskID} , Line: {line}");
+           Console.WriteLine($"ProcessID {ProcessID} , Line: {line}");
             return true;
         }
 
@@ -47,6 +50,7 @@ The Remote Process Manager library provides the launch of a new processes on the
         }
 
         [TestMethod]
+
         public void RunExecCommandWithCallback()
         {
             executerManager.OnTaskExit = OnProcessExiFunctiont;
@@ -58,7 +62,7 @@ The Remote Process Manager library provides the launch of a new processes on the
         ///  Test Multi-Process 
         /// </summary>
         [TestMethod]
-        public void RunExecDotNetCoreTask()
+        public void RunConsoleApplication()
         {
             executerManager.OnTaskExit = OnProcessExiFunctiont;
             executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
@@ -72,13 +76,43 @@ The Remote Process Manager library provides the launch of a new processes on the
         public void AbortProcess()
         {
 
-            String TaskID = Guid.NewGuid().ToString();
+            String ProcessID = Guid.NewGuid().ToString();
             executerManager.OnTaskExit = OnProcessExiFunctiont;
-            executerManager.RunExec(TaskID, "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
+            executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
                 @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
             Thread.Sleep(6000);
-            executerManager.Abort(TaskID);
+            executerManager.Abort(ProcessID);
             executerManager.WaitAll();
+        }
+		
+		[TestMethod]
+        public void GetProcessInfo()
+        {
+            String ProcessID = Guid.NewGuid().ToString();
+            executerManager.OnTaskExit = OnProcessExiFunctiont;
+            executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
+            Thread.Sleep(2000);
+            Process process = executerManager.GetProcess(ProcessID);
+            double mb = (double)process.WorkingSet64;
+            mb = mb / 1000;
+            mb = Math.Truncate(mb) / 1000;
+            Console.WriteLine($"Memory: {mb} MB");
+
+        }
+
+        [TestMethod]
+        public void GetProcessMemory()
+        {
+            String ProcessID = Guid.NewGuid().ToString();
+            executerManager.OnTaskExit = OnProcessExiFunctiont;
+            executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
+            Thread.Sleep(2000);
+            double mb = executerManager.GetProcessMemory(ProcessID);
+
+            Console.WriteLine($"Memory: {mb} MB");
+
         }
 
     }
@@ -89,6 +123,8 @@ The Remote Process Manager library provides the launch of a new processes on the
 Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick ,
 
     vlad.novick@gmail.com
+	
+	http://www.sgcombo.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

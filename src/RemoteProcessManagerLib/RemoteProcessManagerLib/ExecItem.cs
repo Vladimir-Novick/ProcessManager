@@ -31,7 +31,7 @@ namespace RemoteProcessManagerLib.Runner
 {
     public class ExecItem
     {
-        public String TaskName { get; set; }
+        public String ProcessName { get; set; }
         public int Id { get; set; }
         public Task Task_ { get; set; }
         public String Description { get; set; }

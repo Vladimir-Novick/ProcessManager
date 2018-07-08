@@ -33,12 +33,12 @@ namespace RemoteProcessManagerLib.Runner
     public class Utils
     {
 
-        public static Task TaskCleaner;
+        public static Task MemoryCleaner;
 
         private static void SetCompact(int DeltaTime)
         {
 
-            TaskCleaner = new Task(() =>
+            MemoryCleaner = new Task(() =>
               {
                   try
                   {

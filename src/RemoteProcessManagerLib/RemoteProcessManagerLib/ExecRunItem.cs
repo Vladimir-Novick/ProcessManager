@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Text;
 using System.Security;
 using System.Collections.Generic;
 using System.Collections;
@@ -55,10 +54,8 @@ namespace RemoteProcessManagerLib.Runner
             }
         }
 
-
-
         ///
-        /// <summary> Create Task Adapter with domain Credentional </summary> 
+        /// <summary> Create Process Adapter with domain Credentional </summary> 
         /// 
         /// <param name="UserName">Domain Used Name</param>
         /// <param name="Password">Domain user name Password</param>
@@ -74,7 +71,7 @@ namespace RemoteProcessManagerLib.Runner
         private String password = null;
         private String domain = null;
 
-        private String _TaskID = "";
+        private String _ProcessID = "";
 
         private  Func<String,String, bool> Callback;
 
@@ -86,11 +83,19 @@ namespace RemoteProcessManagerLib.Runner
             return RunningProcess;
         }
 
-        public void RunProcess(String TaskID, string EXEFileName, string CommandArguments, Func<String,String, bool> callBack = null, int Timeout = 0)
+        /// <summary>
+        ///   Run process without process manager
+        /// </summary>
+        /// <param name="ProcessID"></param>
+        /// <param name="EXEFileName"></param>
+        /// <param name="CommandArguments"></param>
+        /// <param name="callBack"></param>
+        /// <param name="Timeout"></param>
+        public void RunProcess(String ProcessID, string EXEFileName, string CommandArguments, Func<String,String, bool> callBack = null, int Timeout = 0)
         {
             Callback = callBack;
 
-            _TaskID = TaskID;
+            _ProcessID = ProcessID;
 
             try
             {
@@ -168,10 +173,10 @@ namespace RemoteProcessManagerLib.Runner
             ConcurrentBag<LogsMessage> logMessage;
             if (Callback != null)
             {
-                Callback(_TaskID, message);
+                Callback(_ProcessID, message);
             } else
             {
-                Console.WriteLine($"{_TaskID}, {message}");
+                Console.WriteLine($"{_ProcessID}, {message}");
             }
         }
 

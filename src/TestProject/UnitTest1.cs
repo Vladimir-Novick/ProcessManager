@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RemoteProcessManagerLib.Runner;
 using System;
-
+using System.Diagnostics;
 using System.Threading;
 
 /*
@@ -37,26 +37,26 @@ namespace TestProject
         public static ExecuterManager executerManager = new ExecuterManager(); // Create container
 
         /// <summary>
-        ///    Process  exit collback function
+        ///    Process  exit callback function
         /// </summary>
-        /// <param name="TaskID"></param>
-        /// <param name="TaskName"></param>
+        /// <param name="ProcessID"></param>
+        /// <param name="ProcessName"></param>
         /// <returns></returns>
-        public static bool OnProcessExiFunctiont(String TaskID, String TaskName)
+        public static bool OnProcessExiFunctiont(String ProcessID, String ProcessName)
         {
-            Console.WriteLine($"TaskID: { TaskID} , Task Completed : {TaskName} , Task Container count {executerManager.Count()}");
+            Console.WriteLine($"ProcessID: { ProcessID} , Task Completed : {ProcessName} , Task Container count {executerManager.Count()}");
             return true;
         }
 
         /// <summary>
         ///  Process callback function 
         /// </summary>
-        /// <param name="TaskID"></param>
+        /// <param name="ProcessID"></param>
         /// <param name="line"></param>
         /// <returns></returns>
-        public static bool OnProcessCallBack(String TaskID, String line)
+        public static bool OnProcessCallBack(String ProcessID, String line)
         {
-           Console.WriteLine($"TaskID {TaskID} , Line: {line}");
+           Console.WriteLine($"ProcessID {ProcessID} , Line: {line}");
             return true;
         }
 
@@ -64,7 +64,7 @@ namespace TestProject
         [TestMethod]
         public void RunExecCommand()
         {
-            executerManager.OnTaskExit = OnProcessExiFunctiont;
+            executerManager.OnProcessExit = OnProcessExiFunctiont;
             executerManager.RunExec("CHECK DIR", "dir.exe", "*.*");
         }
 
@@ -72,7 +72,7 @@ namespace TestProject
 
         public void RunExecCommandWithCallback()
         {
-            executerManager.OnTaskExit = OnProcessExiFunctiont;
+            executerManager.OnProcessExit = OnProcessExiFunctiont;
             executerManager.RunExec("CHECK DIR", @"cmd.exe", @"/c dir *.*", "", OnProcessCallBack, @"C:\Windows\System32");
             executerManager.WaitAll(); // wait all task
         }
@@ -81,9 +81,9 @@ namespace TestProject
         ///  Test Multi-Process 
         /// </summary>
         [TestMethod]
-        public void RunExecDotNetCoreTask()
+        public void RunConsoleApplication()
         {
-            executerManager.OnTaskExit = OnProcessExiFunctiont;
+            executerManager.OnProcessExit = OnProcessExiFunctiont;
             executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
                 @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
             executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task2", "", OnProcessCallBack,
@@ -95,13 +95,63 @@ namespace TestProject
         public void AbortProcess()
         {
 
-            String TaskID = Guid.NewGuid().ToString();
-            executerManager.OnTaskExit = OnProcessExiFunctiont;
-            executerManager.RunExec(TaskID, "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
+            String ProcessID = Guid.NewGuid().ToString();
+            executerManager.OnProcessExit = OnProcessExiFunctiont;
+            executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
                 @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
             Thread.Sleep(6000);
-            executerManager.Abort(TaskID);
+            executerManager.Abort(ProcessID);
             executerManager.WaitAll();
+        }
+
+        [TestMethod]
+        public void GetProcessInfo()
+        {
+            String ProcessID = Guid.NewGuid().ToString();
+            executerManager.OnProcessExit = OnProcessExiFunctiont;
+            executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
+            Thread.Sleep(2000);
+            Process process = executerManager.GetProcess(ProcessID);
+            double mb = (double)process.WorkingSet64;
+            mb = mb / 1000;
+            mb = Math.Truncate(mb) / 1000;
+            Console.WriteLine($"Memory: {mb} MB");
+
+        }
+
+        [TestMethod]
+        public void GetProcessMemory()
+        {
+            String ProcessID = Guid.NewGuid().ToString();
+            executerManager.OnProcessExit = OnProcessExiFunctiont;
+            executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
+            Thread.Sleep(2000);
+            double mb = executerManager.GetProcessMemory(ProcessID);
+
+            Console.WriteLine($"Memory: {mb} MB");
+
+        }
+
+        [TestMethod]
+        public void WaitAllProcess()
+        {
+            executerManager.OnProcessExit = OnProcessExiFunctiont;
+            executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
+            executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task2", "", OnProcessCallBack,
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
+            executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task3", "", OnProcessCallBack,
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP"); executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task2", "", OnProcessCallBack,
+              @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
+
+            while (executerManager.Count() > 0)
+            {
+                Console.WriteLine($" Task Completed ");
+                executerManager.WaitAny();
+            }
+
         }
 
     }

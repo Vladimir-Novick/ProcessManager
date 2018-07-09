@@ -60,8 +60,7 @@ namespace RemoteProcessManagerLib.Runner
 
             Task task = new Task(() =>
             {
-               
-
+ 
                 try
                 {
                   
@@ -86,17 +85,27 @@ namespace RemoteProcessManagerLib.Runner
                 executer = null;
 
             });
-            if (!this.TryAdd(task, executer, ProcessID,  description, callBack)) { return "Failed to start. (app already running)"; }
+            if (!this.TryAdd(task, executer, ProcessID,  description, callBack)) {
+                return "Failed to start. (app already running)";
+            }
 
             return error_Message;
 
         }
-
+        /// <summary>
+        ///    Default onExit function
+        /// </summary>
+        /// <param name="ProcessID"></param>
+        /// <param name="Message"></param>
+        /// <returns></returns>
         private Boolean OnExitFunction(String ProcessID,String Message)
         {
             return true;
         }
-
+        /// <summary>
+        ///   Abort process by name 
+        /// </summary>
+        /// <param name="ProcessName"></param>
         public void Abort(string ProcessName)
         {
             ExecItem task = ExecuterContainer.Values.FirstOrDefault(x => x.ProcessName == ProcessName);
@@ -125,14 +134,14 @@ namespace RemoteProcessManagerLib.Runner
             OnProcessExit = OnExitFunction;
         }
 
-        ///    Add Task OnExit Function
+        ///    Process OnExit Function
         /// </summary>
         /// <param name="CallBackExit"></param>
         public Func<String,String, bool> OnProcessExit { private get; set; }
 
 
         /// <summary>
-        ///   Wait All tasks from container
+        ///   Wait All process from container
         /// </summary>
         public void WaitAll()
         {
@@ -191,7 +200,7 @@ namespace RemoteProcessManagerLib.Runner
             return mb;
         }
         /// <summary>
-        ///   Wait all task by specifications list
+        ///   Wait all process by specifications list
         /// </summary>
         /// <param name="processNames"></param>
         public void WaitAll(List<String> processNames)
@@ -235,7 +244,7 @@ namespace RemoteProcessManagerLib.Runner
             }
         }
         /// <summary>
-        ///    Get current task status string
+        ///    Get current process object status string
         /// </summary>
         /// <param name="processName"></param>
         public string GetCurrentStatus(string processName)
@@ -251,7 +260,7 @@ namespace RemoteProcessManagerLib.Runner
             return "Finished";
         }
         /// <summary>
-        ///    Get all active task
+        ///    Get all active process statuses
         /// </summary>
         /// <returns></returns>
         public List<ExecItemStatus> GetStatuses()
@@ -318,7 +327,7 @@ namespace RemoteProcessManagerLib.Runner
             return ExecuterContainer.Count();
         }
         /// <summary>
-        ///   Check specific task is completed
+        ///   Check specific process is completed
         /// </summary>
         /// <param name="processName"></param>
         /// <returns></returns>
@@ -339,7 +348,7 @@ namespace RemoteProcessManagerLib.Runner
             return true;
         }
         /// <summary>
-        ///   Get task status by task name
+        ///   Get process status by process name
         /// </summary>
         /// <param name="processName"></param>
         /// <returns></returns>
@@ -374,7 +383,7 @@ namespace RemoteProcessManagerLib.Runner
         /// <param name="description"></param>
         /// <param name="callBack">   bool myCallBack(string processName ) </param>
         /// <returns></returns>
-        public bool TryAdd(Task task, ExecRunItem executer,String processName = null, String description = null, Func<String,String, bool> callBack = null)
+        private bool TryAdd(Task task, ExecRunItem executer,String processName = null, String description = null, Func<String,String, bool> callBack = null)
         {
 
             String mProcessName = "";

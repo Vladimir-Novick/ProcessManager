@@ -5,9 +5,11 @@ using System.Diagnostics;
 using System.Threading;
 
 /*
-Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick ,
+Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick , 
 
     vlad.novick@gmail.com
+
+    http://www.sgcombo.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -72,9 +74,9 @@ namespace TestProject
 
         public void RunExecCommandWithCallback()
         {
-            executerManager.OnProcessExit = OnProcessExiFunctiont;
+          
             executerManager.RunExec("CHECK DIR", @"cmd.exe", @"/c dir *.*", "", OnProcessCallBack, @"C:\Windows\System32");
-            executerManager.WaitAll(); // wait all task
+            executerManager.WaitAll(); // wait all process
         }
 
         /// <summary>

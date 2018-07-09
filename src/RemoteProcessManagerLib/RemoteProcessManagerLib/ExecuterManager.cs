@@ -8,13 +8,12 @@ using System.Reflection;
 using System.Threading;
 using System.IO;
 using System.Diagnostics;
-
 /*
-Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick , 
 
-    vlad.novick@gmail.com
+Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick ,
 
-    http://www.sgcombo.com
+    vlad.novick@gmail.com , http://www.sgcombo.com , https://github.com/Vladimir-Novick
+	
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,20 +22,18 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 */
-
-
 namespace RemoteProcessManagerLib.Runner
 {
     /// <summary>
@@ -400,42 +397,42 @@ namespace RemoteProcessManagerLib.Runner
 
             task.ContinueWith(currentTask =>
             {
-                ExecItem outTaskItem = null;
+                ExecItem outExecItem = null;
                 try
                 {
                   
                
-                    if (ExecuterContainer.TryGetValue(currentTask.Id, out outTaskItem))
+                    if (ExecuterContainer.TryGetValue(currentTask.Id, out outExecItem))
                     {
-                        if (outTaskItem.Callback != null)
+                        if (outExecItem.Callback != null)
                         {
                             try
                             {
-                                Console.WriteLine($"exit {outTaskItem.ProcessName}");
-                                outTaskItem.Callback(outTaskItem.ProcessName, $"Exit:{outTaskItem.ProcessName}"); // callback function for specific task
+                                Console.WriteLine($"exit {outExecItem.ProcessName}");
+                                outExecItem.Callback(outExecItem.ProcessName, $"Exit:{outExecItem.ProcessName}"); // callback function for specific task
                             }
                             catch (Exception ex) { errorMessage = ex.Message; }
                         }
 
-                         String Name = Remove(outTaskItem);
+                         String Name = Remove(outExecItem);
                     }
 
                     if (OnProcessExit != null)
                     {
-                        Console.WriteLine($"exit {outTaskItem.ProcessName}");
+                        Console.WriteLine($"exit {outExecItem.ProcessName}");
                         if (errorMessage.Length == 0)
                         {
-                            OnProcessExit(outTaskItem.ProcessName, $"Exit"); // Callback exit function for all tasks
+                            OnProcessExit(outExecItem.ProcessName, $"Exit"); // Callback exit function for all tasks
                         } else
                         {
-                            OnProcessExit(outTaskItem.ProcessName, $"error:{errorMessage}"); // Callback exit function for all tasks
+                            OnProcessExit(outExecItem.ProcessName, $"error:{errorMessage}"); // Callback exit function for all tasks
                         }
                     }
                 } catch ( Exception ex)
                 {
-                    if (ExecuterContainer.TryGetValue(currentTask.Id, out outTaskItem))
+                    if (ExecuterContainer.TryGetValue(currentTask.Id, out outExecItem))
                     {
-                        Remove(outTaskItem);
+                        Remove(outExecItem);
                     }
                 }
             });
@@ -491,19 +488,33 @@ namespace RemoteProcessManagerLib.Runner
             return false;
         }
 
+
+        public string GetCurrentMessage(string ProcessName)
+        {
+            if (ExecuterContainer.Count > 0)
+            {
+                ExecItem item = ExecuterContainer.Values.FirstOrDefault(x => x.ProcessName == ProcessName);
+                if (item != null)
+                {
+                    return (item?.runItem?.currentMessage) ?? "";
+                }
+            }
+            return "";
+        }
+
         /// <summary>
         ///    Remove task from container
         /// </summary>
         /// <param name="task"></param>
         /// <returns>TaskItem</returns>
-        private String Remove(ExecItem taskItem)
+        private String Remove(ExecItem execItem)
         {
             ExecItem outItem = null;
             String ProcessName = null;
-            if (taskItem == null) return null;
+            if (execItem == null) return null;
             try
             {
-                if (ExecuterContainer.TryRemove(taskItem.Id, out outItem))
+                if (ExecuterContainer.TryRemove(execItem.Id, out outItem))
                 {
                     if (outItem != null)
                     {

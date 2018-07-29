@@ -225,6 +225,36 @@ namespace RemoteProcessManagerLib.Runner
             catch { }
         }
         /// <summary>
+        ///   Abort all processes
+        /// </summary>
+        public void AbortAll()
+        {
+            var listProceses = ExecuterContainer.Values.ToList();
+            foreach (var task in listProceses)
+            {
+                if (task != null && task.runItem != null)
+                {
+                    try
+                    {
+                        task.runItem.getProcess().Kill();
+                        Console.WriteLine($"Process {task.ProcessName} is killed by user request");
+                        OnProcessExit(task.ProcessName, $"Process is killed by user request");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed Kill Process {task.ProcessName} ");
+                        OnProcessExit(task.ProcessName, $"Failed Kill Process {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($" Process {task.ProcessName} is not exist");
+                    OnProcessExit(task.ProcessName, $" Process  is not exist");
+                }
+            }
+        }
+
+        /// <summary>
         ///    Set Current Task Status 
         /// </summary>
         /// <param name="processName"></param>

@@ -177,5 +177,26 @@ namespace TestProject
             executerManager.WaitAll();
         }
 
+        /// <summary>
+        ///  Abort All Processes
+        /// </summary>
+        [TestMethod]
+        public void AbortAll()
+        {
+
+            executerManager.OnProcessExit = OnProcessExiFunction;
+            executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
+            executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task2", "", OnProcessCallBack,
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
+            executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task3", "", OnProcessCallBack,
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP"); executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task2", "", OnProcessCallBack,
+              @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
+            Thread.Sleep(1000);
+
+            executerManager.AbortAll();
+            executerManager.WaitAll();
+        }
+
     }
 }

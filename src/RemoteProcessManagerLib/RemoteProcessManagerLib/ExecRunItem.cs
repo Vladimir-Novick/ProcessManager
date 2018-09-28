@@ -3,13 +3,11 @@ using System.Diagnostics;
 using System.Security;
 using System.Collections.Generic;
 using System.Collections;
-using System.Collections.Concurrent;
 /*
 
 Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick ,
 
     vlad.novick@gmail.com , http://www.sgcombo.com , https://github.com/Vladimir-Novick
-	
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -81,7 +79,6 @@ namespace RemoteProcessManagerLib.Runner
 
         private Process RunningProcess = null;
 
-
         public Process getProcess()
         {
             return RunningProcess;
@@ -145,7 +142,6 @@ namespace RemoteProcessManagerLib.Runner
                         Console.WriteLine(message);
                         LogMessage(message);
 
-
                     }
                 } else
                 {
@@ -163,7 +159,6 @@ namespace RemoteProcessManagerLib.Runner
             }
             return; 
         }
-
 
         private int processExitCode = 0;
 

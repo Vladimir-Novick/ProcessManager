@@ -1,120 +1,50 @@
-# Remote-Process-Manager 
+# Process-Manager 
 
-The Remote Process Manager library provides the launch multiple asynchronous processes on the remote computer
+The Process Manager library provides the launch multiple asynchronous processes 
  and provides information about their statuses. 
- 
- Your can saving your output to a specified location 
- 
- ( NET CORE 2.1 + Visual Studio 2017 )
- 
-  
-## Example:
- 
-    [TestClass]
-    public class UnitTest
-    {
 
-        public static ExecuterManager executerManager = new ExecuterManager(); // Create container
+### Example:
 
-        /// <summary>
-        ///    Process  exit callback function
-        /// </summary>
-        /// <param name="ProcessID"></param>
-        /// <param name="TaskName"></param>
-        /// <returns></returns>
-        public static bool OnProcessExiFunctiont(String ProcessID, String TaskName)
+#####   Create callback functions:
+
+1) Global callback function:
+       A callback function is executed after any process is finished
+ 
+        public static bool OnExitallbackFunction(String ProcessID, String TaskName)
         {
             Console.WriteLine($"ProcessID: { ProcessID} , Task Completed : {TaskName} , Task Container count {executerManager.Count()}");
             return true;
         }
 
-        /// <summary>
-        ///  Process callback function 
-        /// </summary>
-        /// <param name="ProcessID"></param>
-        /// <param name="line"></param>
-        /// <returns></returns>
+2) Process callback function:
+      A callback function is executed all time if specific process write message to console.
+      Console.WriteLine() is not showing any output on screen.   
+    
+
         public static bool OnProcessCallBack(String ProcessID, String line)
         {
            Console.WriteLine($"ProcessID {ProcessID} , Line: {line}");
             return true;
         }
 
+#####   Using:
 
-        [TestMethod]
-        public void RunExecCommand()
+
+        using (ExecuterManager executerManager = new ExecuterManager())
         {
-            executerManager.OnTaskExit = OnProcessExiFunctiont;
-            executerManager.RunExec("CHECK DIR", "dir.exe", "*.*");
+           executerManager.OnProcessExit = OnExitCallbackFunction;
+           executerManager.RunExec("App_1",
+                   "APP1.exe", "task1", "", 
+                   OnProcessCallBack,
+                    @"D:\STORE");
+           executerManager.RunExec("App_2",
+                   "APP2.exe",
+                    "task2", "",
+                     OnProcessCallBack,
+                     @"D:\STORE");
+           executerManager.WaitAll();
         }
 
-        [TestMethod]
-
-        public void RunExecCommandWithCallback()
-        {
-            executerManager.OnTaskExit = OnProcessExiFunctiont;
-            executerManager.RunExec("CHECK DIR", @"cmd.exe", @"/c dir *.*", "", OnProcessCallBack, @"C:\Windows\System32");
-            executerManager.WaitAll(); // wait all task
-        }
-
-        /// <summary>
-        ///  Test Multi-Process 
-        /// </summary>
-        [TestMethod]
-        public void RunConsoleApplication()
-        {
-            executerManager.OnTaskExit = OnProcessExiFunctiont;
-            executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
-                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
-            executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task2", "", OnProcessCallBack,
-                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
-            executerManager.WaitAll();
-        }
-
-        [TestMethod]
-        public void AbortProcess()
-        {
-
-            String ProcessID = Guid.NewGuid().ToString();
-            executerManager.OnTaskExit = OnProcessExiFunctiont;
-            executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
-                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
-            Thread.Sleep(6000);
-            executerManager.Abort(ProcessID);
-            executerManager.WaitAll();
-        }
-		
-		[TestMethod]
-        public void GetProcessInfo()
-        {
-            String ProcessID = Guid.NewGuid().ToString();
-            executerManager.OnTaskExit = OnProcessExiFunctiont;
-            executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
-                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
-            Thread.Sleep(2000);
-            Process process = executerManager.GetProcess(ProcessID);
-            double mb = (double)process.WorkingSet64;
-            mb = mb / 1000;
-            mb = Math.Truncate(mb) / 1000;
-            Console.WriteLine($"Memory: {mb} MB");
-
-        }
-
-        [TestMethod]
-        public void GetProcessMemory()
-        {
-            String ProcessID = Guid.NewGuid().ToString();
-            executerManager.OnTaskExit = OnProcessExiFunctiont;
-            executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
-                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
-            Thread.Sleep(2000);
-            double mb = executerManager.GetProcessMemory(ProcessID);
-
-            Console.WriteLine($"Memory: {mb} MB");
-
-        }
-
-    }
 
 Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick , 
 

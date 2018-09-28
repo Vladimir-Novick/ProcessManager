@@ -1,7 +1,7 @@
 # Process-Manager 
 
 The Process Manager library provides the launch multiple asynchronous processes 
- and provides information about their statuses. Provides running multiple external console program as hidden.
+ and provides information about their statuses. Provides running multiple external console program as hidden. You must be including RemoteProcessManager in an existing .NET Core application without installation additional components
 
 ### Example:
 

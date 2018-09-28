@@ -1,11 +1,11 @@
 # Process-Manager 
 
 The Process Manager library provides the launch multiple asynchronous processes 
- and provides information about their statuses. 
+ and provides information about their statuses. Provides running multiple external console program as hidden.
 
 ### Example:
 
-#####   Create callback functions:
+####   Create callback functions:
 
 1) Global callback function:
        A callback function is executed after any process is finished
@@ -27,7 +27,7 @@ The Process Manager library provides the launch multiple asynchronous processes
             return true;
         }
 
-#####   Using:
+####   Using:
 
 
         using (ExecuterManager executerManager = new ExecuterManager())

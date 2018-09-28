@@ -14,7 +14,7 @@ The Process Manager library provides the launch multiple asynchronous processes
  
         public static bool OnExitallbackFunction(String ProcessID, String TaskName)
         {
-            Console.WriteLine($"ProcessID: { ProcessID} , Task Completed : {TaskName} , Task Container count {executerManager.Count()}");
+            Console.WriteLine($"ProcessID: { ProcessID} , Task Completed : {TaskName} ");
             return true;
         }
 

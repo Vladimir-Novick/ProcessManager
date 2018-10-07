@@ -33,9 +33,9 @@ namespace RemoteProcessManagerLib.Runner
     public class ExecRunItem
     {
         public List<EnvironmentVariable> EnvironmentVariables = new List<EnvironmentVariable>();
-        public string WorkingDirectory { get; set; } 
+        public string WorkingDirectory { get; set; }
+        public string LatestMessage { get; private set; }
 
-        public string currentMessage { get; private set; }  // Latest message
         private static SecureString MakeSecureString(string text)
         {
             SecureString secure = new SecureString();
@@ -56,8 +56,10 @@ namespace RemoteProcessManagerLib.Runner
             }
         }
 
+
+
         ///
-        /// <summary> Create Process Adapter with domain Credentional </summary> 
+        /// <summary> Create Task Adapter with domain Credentional </summary> 
         /// 
         /// <param name="UserName">Domain Used Name</param>
         /// <param name="Password">Domain user name Password</param>
@@ -75,24 +77,17 @@ namespace RemoteProcessManagerLib.Runner
 
         private String _ProcessID = "";
 
-        private  Func<String,String, bool> Callback;
-
+        private Func<String, String, bool> Callback;
+        //   private StringBuilder strSummaryOutputString = new StringBuilder();
         private Process RunningProcess = null;
+
 
         public Process getProcess()
         {
             return RunningProcess;
         }
 
-        /// <summary>
-        ///   Run process without process manager
-        /// </summary>
-        /// <param name="ProcessID"></param>
-        /// <param name="EXEFileName"></param>
-        /// <param name="CommandArguments"></param>
-        /// <param name="callBack"></param>
-        /// <param name="Timeout"></param>
-        public void RunProcess(String ProcessID, string EXEFileName, string CommandArguments, Func<String,String, bool> callBack = null, int Timeout = 0)
+        public void RunProcess(String ProcessID, string EXEFileName, string CommandArguments, Func<String, String, bool> callBack = null, int Timeout = 0)
         {
             Callback = callBack;
 
@@ -128,7 +123,7 @@ namespace RemoteProcessManagerLib.Runner
                 RunningProcess.ErrorDataReceived += proc_DataReceived;
                 RunningProcess.OutputDataReceived += proc_DataReceived;
                 RunningProcess.StartInfo = StartInfo;
-             
+
                 RunningProcess.Start();
                 RunningProcess.BeginErrorReadLine();
                 RunningProcess.BeginOutputReadLine();
@@ -139,16 +134,21 @@ namespace RemoteProcessManagerLib.Runner
                         RunningProcess.Kill();
                         String message = String.Format(@"Timeout of {0} ms while is executing ""{1} {2}""",
                               Timeout, RunningProcess.StartInfo.FileName, RunningProcess.StartInfo.Arguments);
+#if DEBUG
                         Console.WriteLine(message);
+#endif
                         LogMessage(message);
 
+
                     }
-                } else
+                }
+                else
                 {
                     RunningProcess.WaitForExit();
                 }
-               int exitCode = RunningProcess.ExitCode;
-               LogMessage($"Process Exit with code {exitCode}");
+                int exitCode = RunningProcess.ExitCode;
+                processExitCode = exitCode;
+                LogMessage($"Process Exit with code {exitCode}");
             }
             catch (Exception ex)
             {
@@ -157,8 +157,9 @@ namespace RemoteProcessManagerLib.Runner
                 LogMessage(message);
 
             }
-            return; 
+            return; // strSummaryOutputString.ToString();
         }
+
 
         private int processExitCode = 0;
 
@@ -169,19 +170,23 @@ namespace RemoteProcessManagerLib.Runner
 
         private void LogMessage(string message)
         {
-            currentMessage = message;
+            LatestMessage = message;
             if (Callback != null)
             {
                 Callback(_ProcessID, message);
-            } else
+
+            }
+            else
             {
+#if DEBUG
                 Console.WriteLine($"{_ProcessID}, {message}");
+#endif
             }
         }
 
         private void proc_Exited(object sender, System.EventArgs e)
         {
-          
+
         }
         void proc_DataReceived(object sender, DataReceivedEventArgs e)
         {
@@ -190,7 +195,7 @@ namespace RemoteProcessManagerLib.Runner
             {
 
                 LogMessage(strLine);
-  
+
             }
         }
     }

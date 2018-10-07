@@ -42,13 +42,13 @@ namespace TestProject
         /// </summary>
         /// <param name="ProcessID"></param>
         /// <param name="ProcessName"></param>
+        /// <param name="exitCode"></param>
         /// <returns></returns>
-        public static bool OnExitCallbackFunction(String ProcessID, String ProcessName)
+        public static bool OnExitCallbackFunction(String ProcessID, String ProcessName, String exitCode)
         {
-            Console.WriteLine($"ProcessID: { ProcessID} , Task Completed : {ProcessName} ");
+            Console.WriteLine($"ProcessID: { ProcessID} , Task Completed : {ProcessName} , Exit code {exitCode}");
             return true;
         }
-
         /// <summary>
         ///  Process callback function 
         /// </summary>
@@ -135,7 +135,7 @@ namespace TestProject
             executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
                 @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
             Thread.Sleep(2000);
-            double mb = executerManager.GetProcessMemory(ProcessID);
+            double mb = executerManager.GetMemory(ProcessID);
 
             Console.WriteLine($"Memory: {mb} MB");
             executerManager.WaitAll();
@@ -165,21 +165,22 @@ namespace TestProject
         /// <summary>
         ///  get latest application message by processID
         /// </summary>
+
         [TestMethod]
-        public void GetCurrentMessage()
+        public void GetLatestMessage()
         {
             ExecuterManager executerManager = new ExecuterManager(); // Create container
             String ProcessID = Guid.NewGuid().ToString();
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
-                @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
+                @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
             Thread.Sleep(2000);
-            String lastMessage = executerManager.GetCurrentMessage(ProcessID);
+            String lastMessage = executerManager.GetLatestMessage(ProcessID);
 
             Console.WriteLine($"Last Message: {lastMessage}");
 
             Thread.Sleep(2000);
-            lastMessage = executerManager.GetCurrentMessage(ProcessID);
+            lastMessage = executerManager.GetLatestMessage(ProcessID);
 
             Console.WriteLine($"Last Message: {lastMessage}");
 

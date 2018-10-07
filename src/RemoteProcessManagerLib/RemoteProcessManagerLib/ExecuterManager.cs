@@ -39,33 +39,42 @@ namespace RemoteProcessManagerLib.Runner
     public class ExecuterManager : IDisposable
     {
 
-        public ExecuterManager()
-        {
-           this.ExecuterContainer = new ConcurrentDictionary<int, ExecItem>();
-            OnProcessExit = OnExitFunction;
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (this.ExecuterContainer != null)
-                {
-                    AbortAll();
-                }
-                this.ExecuterContainer = null;
-            }
-            
-        }
+        // Flag: Has Dispose already been called?
+        bool disposed = false;
 
         public void Dispose()
         {
             Dispose(true);
-            // Suppress finalization.
-            GC.SuppressFinalize(this);
+
         }
 
-        public ConcurrentDictionary<int, ExecItem> ExecuterContainer = null;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+            {
+                var v = ExecuterContainer.Values.ToList();
+                foreach (var item in v)
+                {
+                    try
+                    {
+                        Abort(item.ProcessName);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+
+            disposed = true;
+        }
+
+
+        public ConcurrentDictionary<int, ExecItem> ExecuterContainer = new ConcurrentDictionary<int, ExecItem>();
+
 
         public String RunExec(String ProcessID, String exec, String param = "",
                       String description = null, Func<String, String, bool> callBack = null, String workingDir = null, int timeoout = 0)
@@ -74,10 +83,12 @@ namespace RemoteProcessManagerLib.Runner
             ExecRunItem executer = null;
             executer = new ExecRunItem();
 
+
             String error_Message = "";
 
             Task task = new Task(() =>
             {
+
 
                 try
                 {
@@ -104,68 +115,50 @@ namespace RemoteProcessManagerLib.Runner
                 executer = null;
 
             });
-            if (!this.TryAdd(task, executer, ProcessID, description, callBack))
-            {
-                return "Failed to start. (app already running)";
-            }
+            if (!this.TryAdd(task, executer, ProcessID, description, callBack)) { return "Failed to start. (app already running)"; }
 
             return error_Message;
 
         }
-        /// <summary>
-        ///    Default onExit function
-        /// </summary>
-        /// <param name="ProcessID"></param>
-        /// <param name="Message"></param>
-        /// <returns></returns>
-        private Boolean OnExitFunction(String ProcessID, String Message)
+
+        // String description = null, Func<String, bool> callBack
+
+
+
+        private Boolean OnExitFunction(String ProcessID, String Message, String exitCode)
         {
             return true;
         }
-        /// <summary>
-        ///   Abort process by name 
-        /// </summary>
-        /// <param name="ProcessName"></param>
+
         public void Abort(string ProcessName)
         {
             ExecItem task = ExecuterContainer.Values.FirstOrDefault(x => x.ProcessName == ProcessName);
-            if (task != null && task.runItem != null)
+            if (task != null && task.execItem != null)
             {
                 try
                 {
-                    task.runItem.getProcess().Kill();
+                    task.execItem.getProcess().Kill();
+#if DEBUG
                     Console.WriteLine($"Process {ProcessName} is killed by user request");
-                    OnProcessExit(ProcessName, $"Process is killed by user request");
+#endif
+                    OnProcessExit(ProcessName, $"Process is killed by user request", "-1");
                 }
                 catch (Exception ex)
                 {
+#if DEBUG
                     Console.WriteLine($"Failed Kill Process {ProcessName} ");
-                    OnProcessExit(ProcessName, $"Failed Kill Process {ex.Message}");
+#endif
+                    OnProcessExit(ProcessName, $"Failed Kill Process {ex.Message}", "-1");
                 }
             }
             else
             {
+#if DEBUG
                 Console.WriteLine($" Process {ProcessName} is not exist");
-                OnProcessExit(ProcessName, $" Process  is not exist");
+#endif
+                OnProcessExit(ProcessName, $" Process  is not exist", "-1");
             }
         }
-
-        ///    Process OnExit Function
-        /// </summary>
-        /// <param name="CallBackExit"></param>
-        public Func<String, String, bool> OnProcessExit { private get; set; }
-
-        /// <summary>
-        ///   Wait All process from container
-        /// </summary>
-        public void WaitAll()
-        {
-            while (ExecuterContainer.Count > 0)
-            {
-                WaitAny();
-            }
-        }
-
         /// <summary>
         ///    Get process by process ID
         /// </summary>
@@ -174,11 +167,11 @@ namespace RemoteProcessManagerLib.Runner
         public Process GetProcess(string processID)
         {
             ExecItem task = ExecuterContainer.Values.FirstOrDefault(x => x.ProcessName == processID);
-            if (task != null && task.runItem != null)
+            if (task != null && task.execItem != null)
             {
                 try
                 {
-                    return task.runItem.getProcess();
+                    return task.execItem.getProcess();
                 }
                 catch (Exception ex)
                 {
@@ -197,7 +190,7 @@ namespace RemoteProcessManagerLib.Runner
         /// </summary>
         /// <param name="processID"></param>
         /// <returns></returns>
-        public double GetProcessMemory(String processID)
+        public double GetMemory(String processID)
         {
 
             double mb = 0;
@@ -214,11 +207,54 @@ namespace RemoteProcessManagerLib.Runner
             catch (Exception ex) { }
             return mb;
         }
+
+        public ExecuterManager()
+        {
+            OnProcessExit = OnExitFunction;
+        }
+
+
         /// <summary>
-        ///   Wait all process by specifications list
+        ///   Abordt all active processes
         /// </summary>
-        /// <param name="processNames"></param>
-        public void WaitAll(List<String> processNames)
+        public void AbortAll()
+        {
+            var v = ExecuterContainer.Values.ToList();
+            foreach (var item in v)
+            {
+                try
+                {
+                    Abort(item.ProcessName);
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+        }
+
+
+        ///    Add Task OnExit Function
+        /// </summary>
+        /// <param name="CallBackExit"></param>
+        public Func<String, String, String, bool> OnProcessExit { private get; set; }
+
+
+        /// <summary>
+        ///   Wait All tasks from container
+        /// </summary>
+        public void WaitAll()
+        {
+            while (ExecuterContainer.Count > 0)
+            {
+                WaitAny();
+            }
+        }
+        /// <summary>
+        ///   Wait all task by specifications list
+        /// </summary>
+        /// <param name="ProcessNames"></param>
+        public void WaitAll(List<String> ProcessNames)
         {
             try
             {
@@ -227,7 +263,7 @@ namespace RemoteProcessManagerLib.Runner
                 {
                     try
                     {
-                        var ok = processNames.Find(m => m == item.ProcessName);
+                        var ok = ProcessNames.Find(m => m == item.ProcessName);
                         if (ok != null)
                         {
                             if (item.Task_ != null)
@@ -243,46 +279,15 @@ namespace RemoteProcessManagerLib.Runner
             catch { }
         }
         /// <summary>
-        ///   Abort all processes
-        /// </summary>
-        public void AbortAll()
-        {
-            var listProceses = ExecuterContainer.Values.ToList();
-            foreach (var task in listProceses)
-            {
-                if (task != null && task?.runItem != null)
-                {
-                    try
-                    {
-                        task.runItem.getProcess().Kill();
-                        Console.WriteLine($"Process {task.ProcessName} is killed by user request");
-                        OnProcessExit(task.ProcessName, $"Process is killed by user request");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed Kill Process {task.ProcessName} ");
-                        OnProcessExit(task.ProcessName, $"Failed Kill Process {ex.Message}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($" Process {task.ProcessName} is not exist");
-                    OnProcessExit(task.ProcessName, $" Process  is not exist");
-                }
-            }
-        }
-
-        /// <summary>
         ///    Set Current Task Status 
         /// </summary>
-        /// <param name="processName"></param>
+        /// <param name="ProcessName"></param>
         /// <param name="CurrentStatus"></param>
-        public void SetCurrentStatus(string processName, String CurrentStatus)
+        public void SetCurrentStatus(string ProcessName, String CurrentStatus)
         {
             if (ExecuterContainer.Count > 0)
             {
-                var exeList = ExecuterContainer.Values.ToList();
-                ExecItem item = exeList.FirstOrDefault(x => x.ProcessName == processName);
+                ExecItem item = ExecuterContainer.Values.FirstOrDefault(x => x.ProcessName == ProcessName);
                 if (item != null)
                 {
                     item.CurrentStatus = CurrentStatus;
@@ -290,15 +295,14 @@ namespace RemoteProcessManagerLib.Runner
             }
         }
         /// <summary>
-        ///    Get current process object status string
+        ///    Get current task status string
         /// </summary>
-        /// <param name="processName"></param>
-        public string GetCurrentStatus(string processName)
+        /// <param name="ProcessName"></param>
+        public string GetCurrentStatus(string ProcessName)
         {
             if (ExecuterContainer.Count > 0)
             {
-                var exeList = ExecuterContainer.Values.ToList();
-                ExecItem item = exeList.FirstOrDefault(x => x.ProcessName == processName);
+                ExecItem item = ExecuterContainer.Values.FirstOrDefault(x => x.ProcessName == ProcessName);
                 if (item != null)
                 {
                     return item.CurrentStatus;
@@ -306,8 +310,23 @@ namespace RemoteProcessManagerLib.Runner
             }
             return "Finished";
         }
+
+        public string GetLatestMessage(string ProcessName)
+        {
+            if (ExecuterContainer.Count > 0)
+            {
+                ExecItem item = ExecuterContainer.Values.FirstOrDefault(x => x.ProcessName == ProcessName);
+                if (item != null)
+                {
+                    return (item?.execItem?.LatestMessage) ?? "";
+                }
+            }
+            return "";
+        }
+
+
         /// <summary>
-        ///    Get all active process statuses
+        ///    Get all active task
         /// </summary>
         /// <returns></returns>
         public List<ExecItemStatus> GetStatuses()
@@ -315,8 +334,7 @@ namespace RemoteProcessManagerLib.Runner
             List<ExecItemStatus> TaskList = new List<ExecItemStatus>();
             try
             {
-                var exeList = ExecuterContainer.Values.ToList();
-                foreach (var item in exeList)
+                foreach (var item in ExecuterContainer.Values)
                 {
                     try
                     {
@@ -357,8 +375,7 @@ namespace RemoteProcessManagerLib.Runner
             try
             {
                 List<Task> TaskList = new List<Task>();
-                var exeList = ExecuterContainer.Values.ToList();
-                foreach (var item in exeList)
+                foreach (var item in ExecuterContainer.Values)
                 {
                     TaskList.Add(item.Task_);
                 }
@@ -376,18 +393,17 @@ namespace RemoteProcessManagerLib.Runner
             return ExecuterContainer.Count();
         }
         /// <summary>
-        ///   Check specific process is completed
+        ///   Check specific task is completed
         /// </summary>
-        /// <param name="processName"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
-        public bool IsCompleted(String processName)
+        public bool IsCompleted(String name)
         {
             try
             {
                 if (ExecuterContainer.Count > 0)
                 {
-                    var exeList = ExecuterContainer.Values.ToList();
-                    ExecItem item = exeList.FirstOrDefault(x => x.ProcessName == processName);
+                    ExecItem item = ExecuterContainer.Values.FirstOrDefault(x => x.ProcessName == name);
                     if (item != null)
                     {
                         return false;
@@ -398,18 +414,18 @@ namespace RemoteProcessManagerLib.Runner
             return true;
         }
         /// <summary>
-        ///   Get process status by process name
+        ///   Get task status by task name
         /// </summary>
-        /// <param name="processName"></param>
+        /// <param name="ProcessName"></param>
         /// <returns></returns>
-        public TaskStatus Status(String processName)
+        public TaskStatus Status(String ProcessName)
         {
             try
             {
                 if (ExecuterContainer.Count > 0)
                 {
                     List<ExecItem> items = ExecuterContainer.Values.ToList<ExecItem>();
-                    ExecItem item = items.FirstOrDefault(x => x.ProcessName == processName);
+                    ExecItem item = items.FirstOrDefault(x => x.ProcessName == ProcessName);
                     if (item != null)
                     {
                         Task task = item.Task_;
@@ -418,9 +434,15 @@ namespace RemoteProcessManagerLib.Runner
                     }
                 }
             }
-            catch { }
+            catch (Exception)
+            {
+
+            }
             return TaskStatus.RanToCompletion;
         }
+
+
+
 
         /// <summary>
         ///    Add a task to container
@@ -428,66 +450,70 @@ namespace RemoteProcessManagerLib.Runner
         /// <param name="task"></param>
         /// <param name="ProcessID"></param>
         /// <param name="description"></param>
-        /// <param name="callBack">   bool myCallBack(string processName ) </param>
+        /// <param name="callBack">   bool myCallBack(string ProcessName ) </param>
         /// <returns></returns>
-        private bool TryAdd(Task task, ExecRunItem executer, String processName = null, String description = null, Func<String, String, bool> callBack = null)
+        private bool TryAdd(Task task, ExecRunItem executer, String ParamProcessName = null, String description = null, Func<String, String, bool> callBack = null)
         {
 
             String mProcessName = "";
 
             String errorMessage = "";
 
-            if (processName == null || processName == "")
+            if (ParamProcessName == null || ParamProcessName == "")
             {
                 mProcessName = Guid.NewGuid().ToString();
             }
             else
             {
-                mProcessName = processName;
+                mProcessName = ParamProcessName;
             }
 
             task.ContinueWith(currentTask =>
             {
-                ExecItem outExecItem = null;
+                ExecItem outTaskItem = null;
                 try
                 {
 
-                    if (ExecuterContainer.TryGetValue(currentTask.Id, out outExecItem))
+
+
+                    if (ExecuterContainer.TryGetValue(currentTask.Id, out outTaskItem))
                     {
-                        if (outExecItem.Callback != null)
+                        if (outTaskItem.Callback != null)
                         {
                             try
                             {
-                                Console.WriteLine($"exit {outExecItem.ProcessName}");
-                                outExecItem.Callback(outExecItem.ProcessName, $"Exit:{outExecItem.ProcessName}"); // callback function for specific task
+#if DEBUG
+                                Console.WriteLine($"exit {outTaskItem.ProcessName}");
+#endif
+                                outTaskItem.Callback(outTaskItem.ProcessName, $"Exit:{outTaskItem.ProcessName}"); // callback function for specific task
                             }
                             catch (Exception ex) { errorMessage = ex.Message; }
                         }
 
-                        String Name = Remove(outExecItem);
+                        String Name = Remove(outTaskItem);
                     }
 
                     if (OnProcessExit != null)
                     {
-                        Console.WriteLine($"exit {outExecItem.ProcessName}");
+                        Console.WriteLine($"exit {outTaskItem.ProcessName}");
                         if (errorMessage.Length == 0)
                         {
-                            OnProcessExit(outExecItem.ProcessName, $"Exit"); // Callback exit function for all tasks
+                            OnProcessExit(outTaskItem.ProcessName, $"Exit", outTaskItem?.execItem?.getExitCode().ToString()); // Callback exit function for all tasks
                         }
                         else
                         {
-                            OnProcessExit(outExecItem.ProcessName, $"error:{errorMessage}"); // Callback exit function for all tasks
+                            OnProcessExit(outTaskItem.ProcessName, $"error:{errorMessage}", outTaskItem?.execItem?.getExitCode().ToString()); // Callback exit function for all tasks
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    if (ExecuterContainer.TryGetValue(currentTask.Id, out outExecItem))
-                    {
-                        Remove(outExecItem);
-                    }
+                    OnProcessExit(outTaskItem.ProcessName, $"error:{ex.Message}", outTaskItem?.execItem?.getExitCode().ToString()); // Callback exit function for all tasks
+                    Remove(outTaskItem);
                 }
             });
+
+
 
             String _description = description;
 
@@ -506,8 +532,10 @@ namespace RemoteProcessManagerLib.Runner
                 }
                 catch (Exception ex)
                 {
+#if DEBUG
                     Console.WriteLine(ex.Message);
-
+#endif
+                    throw;
                 }
             }
             var taskItem = new ExecItem
@@ -519,7 +547,7 @@ namespace RemoteProcessManagerLib.Runner
                 Description = _description,
                 Callback = callBack,
                 CurrentStatus = "Started",
-                runItem = executer
+                execItem = executer
             };
             List<ExecItem> items = ExecuterContainer.Values.ToList<ExecItem>();
             ExecItem item = items.FirstOrDefault(x => x.ProcessName == mProcessName);
@@ -541,33 +569,20 @@ namespace RemoteProcessManagerLib.Runner
             return false;
         }
 
-        public string GetCurrentMessage(string ProcessName)
-        {
-            if (ExecuterContainer.Count > 0)
-            {
-                var exeList = ExecuterContainer.Values.ToList();
-                ExecItem item = exeList.FirstOrDefault(x => x.ProcessName == ProcessName);
-                if (item != null)
-                {
-                    return (item?.runItem?.currentMessage) ?? "";
-                }
-            }
-            return "";
-        }
 
         /// <summary>
-        ///   Remove task from container
+        ///    Remove task from container
         /// </summary>
-        /// <param name="execItem"></param>
-        /// <returns></returns>
-        private String Remove(ExecItem execItem)
+        /// <param name="task"></param>
+        /// <returns>TaskItem</returns>
+        public String Remove(ExecItem taskItem)
         {
             ExecItem outItem = null;
             String ProcessName = null;
-            if (execItem == null) return null;
+            if (taskItem == null) return null;
             try
             {
-                if (ExecuterContainer.TryRemove(execItem.Id, out outItem))
+                if (ExecuterContainer.TryRemove(taskItem.Id, out outItem))
                 {
                     if (outItem != null)
                     {

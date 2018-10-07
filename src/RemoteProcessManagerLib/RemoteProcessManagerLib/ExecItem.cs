@@ -37,13 +37,13 @@ namespace RemoteProcessManagerLib.Runner
         public DateTime StartTime { get; set; }
         private int HashCode { get; set; }
 
-        public ExecRunItem runItem { get; set; } = null;
+        public ExecRunItem execItem { get; set; } = null;
 
         /// <summary>
         ///    Callback functions 
         /// </summary>
-        public Func<String,String, bool> Callback;
-        public static bool operator == (ExecItem taskItem, Task task)
+        public Func<String, String, bool> Callback;
+        public static bool operator ==(ExecItem taskItem, Task task)
         {
             if ((task == null) && (taskItem as Object != null)) return false;
             if ((task == null) && (taskItem as Object == null)) return true;

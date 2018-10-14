@@ -36,16 +36,28 @@
                Running multiple processes asynchronously
             </summary>
         </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.Dispose">
+            <summary>
+               Dispose method to release unmanaged resources used by your application.
+               Abort all running process on the container
+            </summary>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.Dispose(System.Boolean)">
+            <summary>
+               Dispose method to release unmanaged resources used by your application.
+               Abort all running process on the container
+            </summary>
+        </member>
         <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.RunExec(System.String,System.String,System.String,System.String,System.Func{System.String,System.String,System.Boolean},System.String,System.Int32)">
             <summary>
-              Add process to process manager and run it 
+              Adds a Process to the Execute Container if the ProcessID does not already exist
             </summary>
-            <param name="ProcessID"></param>
-            <param name="exec"></param>
-            <param name="param"></param>
-            <param name="description"></param>
-            <param name="callBack"></param>
-            <param name="workingDir"></param>
+            <param name="ProcessID">Unigue Process ID</param>
+            <param name="exec">Execute Task Name</param>
+            <param name="param">Prameters line</param>
+            <param name="description">Process description</param>
+            <param name="callBack">Callback function</param>
+            <param name="workingDir">Directory</param>
             <param name="timeoout"></param>
             <returns></returns>
         </member>
@@ -58,7 +70,7 @@
         </member>
         <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.GetProcess(System.String)">
             <summary>
-                Procedure to find process by ID
+                Get active process by ID
             </summary>
             <param name="processID"></param>
             <returns></returns>
@@ -77,7 +89,8 @@
         </member>
         <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.AbortAll">
             <summary>
-              Use AbortAll to Stop Processes all process Executer Manager. In contrast, kill terminates processes based on Process ID number 
+              Use AbortAll to Stop Processes all process Executer Manager.
+              In contrast, kill terminates processes based on Process ID number 
             </summary>
         </member>
         <member name="P:RemoteProcessManagerLib.Runner.ExecuterManager.OnProcessExit">
@@ -132,7 +145,7 @@
         </member>
         <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.WaitAny">
             <summary>
-              Wait Any Task.  WaitAny locks the current thread until any tasks have completed execution.
+              Wait Any Task.  WaitAny locks the current thread until any process have completed execution.
             </summary>
         </member>
         <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.Count">

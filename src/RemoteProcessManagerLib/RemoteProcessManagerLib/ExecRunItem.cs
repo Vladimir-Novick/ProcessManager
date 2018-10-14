@@ -149,6 +149,7 @@ namespace RemoteProcessManagerLib.Runner
         private void LogMessage(string message)
         {
             LatestMessage = message;
+           
             if (Callback != null)
             {
                 Callback(_ProcessID, message);

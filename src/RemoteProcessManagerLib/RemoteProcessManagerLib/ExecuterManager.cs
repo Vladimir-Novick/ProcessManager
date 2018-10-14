@@ -67,14 +67,14 @@ namespace RemoteProcessManagerLib.Runner
         }
         private ConcurrentDictionary<int, ExecItem> ExecuterContainer = new ConcurrentDictionary<int, ExecItem>();
         /// <summary>
-        ///   Add process to process manager and run it 
+        ///   Adds a Process to the Execute Container if the ProcessID does not already exist
         /// </summary>
-        /// <param name="ProcessID"></param>
-        /// <param name="exec"></param>
-        /// <param name="param"></param>
-        /// <param name="description"></param>
-        /// <param name="callBack"></param>
-        /// <param name="workingDir"></param>
+        /// <param name="ProcessID">Unigue Process ID</param>
+        /// <param name="exec">Execute Task Name</param>
+        /// <param name="param">Prameters line</param>
+        /// <param name="description">Process description</param>
+        /// <param name="callBack">Callback function</param>
+        /// <param name="workingDir">Directory</param>
         /// <param name="timeoout"></param>
         /// <returns></returns>
         public String RunExec(String ProcessID, String exec, String param = "",

@@ -4,4 +4,9 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>doc\</OutputPath>
+    <DocumentationFile>doc\RemoteProcessManagerLib.xml</DocumentationFile>
+  </PropertyGroup>
+
 </Project>

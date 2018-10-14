@@ -5,7 +5,26 @@ The Process Manager library provides the launch multiple asynchronous processes
  
  You must be including RemoteProcessManager in an existing .NET Core application without installation additional components
 
-### Example:
+### Using Process Manager
+
+####   Using:
+
+
+        using (ExecuterManager executerManager = new ExecuterManager())
+        {
+           executerManager.OnProcessExit = OnExitCallbackFunction;
+           executerManager.RunExec("App_1",
+                   "APP1.exe", "task1", "", 
+                   OnProcessCallBack,
+                    @"D:\STORE");
+           executerManager.RunExec("App_2",
+                   "APP2.exe",
+                    "task2", "",
+                     OnProcessCallBack,
+                     @"D:\STORE");
+           executerManager.WaitAll();
+        }
+
 
 ####   Create callback functions:
 
@@ -29,23 +48,6 @@ The Process Manager library provides the launch multiple asynchronous processes
             return true;
         }
 
-####   Using:
-
-
-        using (ExecuterManager executerManager = new ExecuterManager())
-        {
-           executerManager.OnProcessExit = OnExitCallbackFunction;
-           executerManager.RunExec("App_1",
-                   "APP1.exe", "task1", "", 
-                   OnProcessCallBack,
-                    @"D:\STORE");
-           executerManager.RunExec("App_2",
-                   "APP2.exe",
-                    "task2", "",
-                     OnProcessCallBack,
-                     @"D:\STORE");
-           executerManager.WaitAll();
-        }
 
 
 Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick , 

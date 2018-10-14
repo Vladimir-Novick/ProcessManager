@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RemoteProcessManagerLib</name>
+    </assembly>
+    <members>
+        <member name="T:RemoteProcessManagerLib.Runner.EnvironmentVariable">
+            <summary>
+             An environment variable is a dynamic-named value that can affect the way running processes . 
+             They are part of the environment in which a process runs.
+             Default - System environment variable
+            </summary>
+        </member>
+        <member name="F:RemoteProcessManagerLib.Runner.ExecItem.Callback">
+            <summary>
+               Callback functions 
+            </summary>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecRunItem.#ctor(System.String,System.String,System.String)">
+            
+             <summary> Create Task Adapter with domain Credentional </summary> 
+             
+             <param name="UserName">Domain Used Name</param>
+             <param name="Password">Domain user name Password</param>
+             <param name="Domain">Domain Name</param>
+            
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecRunItem.getExitCode">
+            <summary>
+             Get exit code
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:RemoteProcessManagerLib.Runner.ExecuterManager">
+            <summary>
+               Running multiple processes asynchronously
+            </summary>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.RunExec(System.String,System.String,System.String,System.String,System.Func{System.String,System.String,System.Boolean},System.String,System.Int32)">
+            <summary>
+              Add process to process manager and run it 
+            </summary>
+            <param name="ProcessID"></param>
+            <param name="exec"></param>
+            <param name="param"></param>
+            <param name="description"></param>
+            <param name="callBack"></param>
+            <param name="workingDir"></param>
+            <param name="timeoout"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.Abort(System.String)">
+            <summary>
+              Kill the process by specifying its ProcessName. 
+              All the below kill conventions will send the TERM signal to the specified process.
+            </summary>
+            <param name="ProcessName"></param>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.GetProcess(System.String)">
+            <summary>
+                Procedure to find process by ID
+            </summary>
+            <param name="processID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.GetMemory(System.String)">
+            <summary>
+              Get process memory (MB , trancate KB )
+            </summary>
+            <param name="processID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.#ctor">
+            <summary>
+              Default Constructor.
+            </summary>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.AbortAll">
+            <summary>
+              Use AbortAll to Stop Processes all process Executer Manager. In contrast, kill terminates processes based on Process ID number 
+            </summary>
+        </member>
+        <member name="P:RemoteProcessManagerLib.Runner.ExecuterManager.OnProcessExit">
+            <summary>
+              Task OnExit Callback Function
+            </summary>
+            <code>  
+             Example:
+               public static bool OnExitCallbackFunction(String ProcessID, String ProcessName, String exitCode)
+               {
+                  Console.WriteLine($"ProcessID: { ProcessID} , Task Completed : {ProcessName} , Exit code {exitCode}");
+                   return true;
+               }
+             </code>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.WaitAll">
+            <summary>
+              Wait All tasks from container
+            </summary>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.WaitAll(System.Collections.Generic.List{System.String})">
+            <summary>
+               The WaitAll blocks the current thread until all other tasks have completed execution.
+            </summary>
+            <param name="ProcessNames">List of process names</param>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.SetCurrentStatus(System.String,System.String)">
+            <summary>
+               Set Current Task Status 
+            </summary>
+            <param name="ProcessName"></param>
+            <param name="CurrentStatus"></param>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.GetCurrentStatus(System.String)">
+            <summary>
+               Get current task status string
+            </summary>
+            <param name="ProcessName"></param>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.GetLatestMessage(System.String)">
+            <summary>
+              Get Message from Active Process
+            </summary>
+            <param name="ProcessName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.GetStatuses">
+            <summary>
+               Get all active task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.WaitAny">
+            <summary>
+              Wait Any Task.  WaitAny locks the current thread until any tasks have completed execution.
+            </summary>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.Count">
+            <summary>
+               Get Task Count on container
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.IsCompleted(System.String)">
+            <summary>
+              Check specific task is completed
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.Status(System.String)">
+            <summary>
+              Get task status by task name
+            </summary>
+            <param name="ProcessName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:RemoteProcessManagerLib.Runner.ExecuterManager.Remove(RemoteProcessManagerLib.Runner.ExecItem)">
+            <summary>
+               Remove task from container
+            </summary>
+            <param name="taskItem"></param>
+            <returns>TaskItem</returns>
+        </member>
+    </members>
+</doc>

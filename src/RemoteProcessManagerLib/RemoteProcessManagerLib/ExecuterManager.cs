@@ -7,21 +7,16 @@ using System.Reflection;
 using System.IO;
 using System.Diagnostics;
 /*
-
 Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick ,
-
 vlad.novick@gmail.com , http://www.sgcombo.com , https://github.com/Vladimir-Novick
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,7 +24,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
 */
 namespace RemoteProcessManagerLib.Runner
 {
@@ -38,21 +32,23 @@ namespace RemoteProcessManagerLib.Runner
     /// </summary>
     public class ExecuterManager : IDisposable
     {
-
-        // Flag: Has Dispose already been called?
         bool disposed = false;
-
+        /// <summary>
+        ///    Dispose method to release unmanaged resources used by your application.
+        ///    Abort all running process on the container
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
-
         }
-
+        /// <summary>
+        ///    Dispose method to release unmanaged resources used by your application.
+        ///    Abort all running process on the container
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (disposed)
                 return;
-
             if (disposing)
             {
                 var v = ExecuterContainer.Values.ToList();
@@ -64,35 +60,33 @@ namespace RemoteProcessManagerLib.Runner
                     }
                     catch (Exception ex)
                     {
-
                     }
                 }
             }
-
             disposed = true;
         }
-
-
-        public ConcurrentDictionary<int, ExecItem> ExecuterContainer = new ConcurrentDictionary<int, ExecItem>();
-
-
+        private ConcurrentDictionary<int, ExecItem> ExecuterContainer = new ConcurrentDictionary<int, ExecItem>();
+        /// <summary>
+        ///   Add process to process manager and run it 
+        /// </summary>
+        /// <param name="ProcessID"></param>
+        /// <param name="exec"></param>
+        /// <param name="param"></param>
+        /// <param name="description"></param>
+        /// <param name="callBack"></param>
+        /// <param name="workingDir"></param>
+        /// <param name="timeoout"></param>
+        /// <returns></returns>
         public String RunExec(String ProcessID, String exec, String param = "",
                       String description = null, Func<String, String, bool> callBack = null, String workingDir = null, int timeoout = 0)
         {
-
             ExecRunItem executer = null;
             executer = new ExecRunItem();
-
-
             String error_Message = "";
-
             Task task = new Task(() =>
             {
-
-
                 try
                 {
-
                     executer.setSystemEnvironment();
                     String exec1 = exec;
                     if (workingDir == null)
@@ -105,31 +99,26 @@ namespace RemoteProcessManagerLib.Runner
                         exec1 = workingDir + Path.DirectorySeparatorChar + exec;
                     }
                     executer.RunProcess(ProcessID, exec1, param, callBack, timeoout);
-
                 }
                 catch (Exception ex)
                 {
                     error_Message = ex.Message;
-
                 }
                 executer = null;
-
             });
             if (!this.TryAdd(task, executer, ProcessID, description, callBack)) { return "Failed to start. (app already running)"; }
-
             return error_Message;
-
         }
-
         // String description = null, Func<String, bool> callBack
-
-
-
         private Boolean OnExitFunction(String ProcessID, String Message, String exitCode)
         {
             return true;
         }
-
+        /// <summary>
+        ///   Kill the process by specifying its ProcessName. 
+        ///   All the below kill conventions will send the TERM signal to the specified process.
+        /// </summary>
+        /// <param name="ProcessName"></param>
         public void Abort(string ProcessName)
         {
             ExecItem task = ExecuterContainer.Values.FirstOrDefault(x => x.ProcessName == ProcessName);
@@ -160,7 +149,7 @@ namespace RemoteProcessManagerLib.Runner
             }
         }
         /// <summary>
-        ///    Get process by process ID
+        ///     Get active process by ID
         /// </summary>
         /// <param name="processID"></param>
         /// <returns></returns>
@@ -183,7 +172,6 @@ namespace RemoteProcessManagerLib.Runner
             {
                 throw new InvalidDataException(processID);
             }
-
         }
         /// <summary>
         ///   Get process memory (MB , trancate KB )
@@ -192,7 +180,6 @@ namespace RemoteProcessManagerLib.Runner
         /// <returns></returns>
         public double GetMemory(String processID)
         {
-
             double mb = 0;
             try
             {
@@ -207,15 +194,16 @@ namespace RemoteProcessManagerLib.Runner
             catch (Exception ex) { }
             return mb;
         }
-
+        /// <summary>
+        ///   Default Constructor.
+        /// </summary>
         public ExecuterManager()
         {
             OnProcessExit = OnExitFunction;
         }
-
-
         /// <summary>
-        ///   Abordt all active processes
+        ///   Use AbortAll to Stop Processes all process Executer Manager.
+        ///   In contrast, kill terminates processes based on Process ID number 
         /// </summary>
         public void AbortAll()
         {
@@ -228,18 +216,21 @@ namespace RemoteProcessManagerLib.Runner
                 }
                 catch (Exception ex)
                 {
-
                 }
             }
         }
-
-
-        ///    Add Task OnExit Function
+        /// <summary>
+        ///   Task OnExit Callback Function
         /// </summary>
-        /// <param name="CallBackExit"></param>
+        /// <code>  
+        ///  Example:
+        ///    public static bool OnExitCallbackFunction(String ProcessID, String ProcessName, String exitCode)
+        ///    {
+        ///       Console.WriteLine($"ProcessID: { ProcessID} , Task Completed : {ProcessName} , Exit code {exitCode}");
+        ///        return true;
+        ///    }
+        ///  </code>
         public Func<String, String, String, bool> OnProcessExit { private get; set; }
-
-
         /// <summary>
         ///   Wait All tasks from container
         /// </summary>
@@ -251,9 +242,9 @@ namespace RemoteProcessManagerLib.Runner
             }
         }
         /// <summary>
-        ///   Wait all task by specifications list
+        ///    The WaitAll blocks the current thread until all other tasks have completed execution.
         /// </summary>
-        /// <param name="ProcessNames"></param>
+        /// <param name="ProcessNames">List of process names</param>
         public void WaitAll(List<String> ProcessNames)
         {
             try
@@ -310,7 +301,11 @@ namespace RemoteProcessManagerLib.Runner
             }
             return "Finished";
         }
-
+        /// <summary>
+        ///   Get Message from Active Process
+        /// </summary>
+        /// <param name="ProcessName"></param>
+        /// <returns></returns>
         public string GetLatestMessage(string ProcessName)
         {
             if (ExecuterContainer.Count > 0)
@@ -323,8 +318,6 @@ namespace RemoteProcessManagerLib.Runner
             }
             return "";
         }
-
-
         /// <summary>
         ///    Get all active task
         /// </summary>
@@ -368,7 +361,7 @@ namespace RemoteProcessManagerLib.Runner
             return TaskList;
         }
         /// <summary>
-        ///   Wait Any Task
+        ///   Wait Any Task.  WaitAny locks the current thread until any process have completed execution.
         /// </summary>
         public void WaitAny()
         {
@@ -383,9 +376,8 @@ namespace RemoteProcessManagerLib.Runner
             }
             catch { }
         }
-
         /// <summary>
-        ///    Get Task Count
+        ///    Get Task Count on container
         /// </summary>
         /// <returns></returns>
         public int Count()
@@ -436,29 +428,13 @@ namespace RemoteProcessManagerLib.Runner
             }
             catch (Exception)
             {
-
             }
             return TaskStatus.RanToCompletion;
         }
-
-
-
-
-        /// <summary>
-        ///    Add a task to container
-        /// </summary>
-        /// <param name="task"></param>
-        /// <param name="ProcessID"></param>
-        /// <param name="description"></param>
-        /// <param name="callBack">   bool myCallBack(string ProcessName ) </param>
-        /// <returns></returns>
         private bool TryAdd(Task task, ExecRunItem executer, String ParamProcessName = null, String description = null, Func<String, String, bool> callBack = null)
         {
-
             String mProcessName = "";
-
             String errorMessage = "";
-
             if (ParamProcessName == null || ParamProcessName == "")
             {
                 mProcessName = Guid.NewGuid().ToString();
@@ -467,15 +443,11 @@ namespace RemoteProcessManagerLib.Runner
             {
                 mProcessName = ParamProcessName;
             }
-
             task.ContinueWith(currentTask =>
             {
                 ExecItem outTaskItem = null;
                 try
                 {
-
-
-
                     if (ExecuterContainer.TryGetValue(currentTask.Id, out outTaskItem))
                     {
                         if (outTaskItem.Callback != null)
@@ -489,10 +461,8 @@ namespace RemoteProcessManagerLib.Runner
                             }
                             catch (Exception ex) { errorMessage = ex.Message; }
                         }
-
                         String Name = Remove(outTaskItem);
                     }
-
                     if (OnProcessExit != null)
                     {
                         Console.WriteLine($"exit {outTaskItem.ProcessName}");
@@ -512,11 +482,7 @@ namespace RemoteProcessManagerLib.Runner
                     Remove(outTaskItem);
                 }
             });
-
-
-
             String _description = description;
-
             if (_description == null)
             {
                 try
@@ -568,12 +534,10 @@ namespace RemoteProcessManagerLib.Runner
             }
             return false;
         }
-
-
         /// <summary>
         ///    Remove task from container
         /// </summary>
-        /// <param name="task"></param>
+        /// <param name="taskItem"></param>
         /// <returns>TaskItem</returns>
         public String Remove(ExecItem taskItem)
         {

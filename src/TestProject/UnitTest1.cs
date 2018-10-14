@@ -4,22 +4,16 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 /*
-
 Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick ,
-
     vlad.novick@gmail.com , http://www.sgcombo.com , https://github.com/Vladimir-Novick
-	
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,16 +21,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
 */
 namespace TestProject
 {
     [TestClass]
     public class UnitTest
     {
-
-
-
         /// <summary>
         ///    Process  exit callback function
         /// </summary>
@@ -60,8 +50,6 @@ namespace TestProject
             Console.WriteLine($"ProcessID {ProcessID} , Line: {line}");
             return true;
         }
-
-
         [TestMethod]
         public void RunExecCommand()
         {
@@ -70,16 +58,13 @@ namespace TestProject
             executerManager.RunExec("CHECK DIR", "dir.exe", "*.*");
             executerManager.WaitAll(); // wait all process
         }
-
         [TestMethod]
-
         public void RunExecCommandWithCallback()
         {
             ExecuterManager executerManager = new ExecuterManager(); // Create container
             executerManager.RunExec("CHECK DIR", @"cmd.exe", @"/c dir *.*", "", OnProcessCallBack, @"C:\Windows\System32");
             executerManager.WaitAll(); // wait all process
         }
-
         /// <summary>
         ///  Test Multi-Process 
         /// </summary>
@@ -94,7 +79,6 @@ namespace TestProject
                 @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
             executerManager.WaitAll();
         }
-
         [TestMethod]
         public void AbortProcess()
         {
@@ -107,7 +91,6 @@ namespace TestProject
             executerManager.Abort(ProcessID);
             executerManager.WaitAll();
         }
-
         [TestMethod]
         public void GetProcessInfo()
         {
@@ -123,9 +106,7 @@ namespace TestProject
             mb = Math.Truncate(mb) / 1000;
             Console.WriteLine($"Memory: {mb} MB");
             executerManager.WaitAll();
-
         }
-
         [TestMethod]
         public void GetProcessMemory()
         {
@@ -136,12 +117,9 @@ namespace TestProject
                 @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
             Thread.Sleep(2000);
             double mb = executerManager.GetMemory(ProcessID);
-
             Console.WriteLine($"Memory: {mb} MB");
             executerManager.WaitAll();
-
         }
-
         [TestMethod]
         public void WaitAllProcess()
         {
@@ -154,18 +132,15 @@ namespace TestProject
             executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task3", "", OnProcessCallBack,
                 @"D:\STORE_EXEC\TEST_MANAGEMED_APP"); executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task2", "", OnProcessCallBack,
               @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
-
             while (executerManager.Count() > 0)
             {
                 Console.WriteLine($" Task Completed ");
                 executerManager.WaitAny();
             }
-
         }
         /// <summary>
         ///  get latest application message by processID
         /// </summary>
-
         [TestMethod]
         public void GetLatestMessage()
         {
@@ -176,24 +151,18 @@ namespace TestProject
                 @"E:\STORE_EXEC\TEST_MANAGEMED_APP");
             Thread.Sleep(2000);
             String lastMessage = executerManager.GetLatestMessage(ProcessID);
-
             Console.WriteLine($"Last Message: {lastMessage}");
-
             Thread.Sleep(2000);
             lastMessage = executerManager.GetLatestMessage(ProcessID);
-
             Console.WriteLine($"Last Message: {lastMessage}");
-
             executerManager.WaitAll();
         }
-
         /// <summary>
         ///  Abort All Processes
         /// </summary>
         [TestMethod]
         public void AbortAll()
         {
-
             ExecuterManager executerManager = new ExecuterManager(); // Create container
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
@@ -204,15 +173,12 @@ namespace TestProject
                 @"D:\STORE_EXEC\TEST_MANAGEMED_APP"); executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task2", "", OnProcessCallBack,
               @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
             Thread.Sleep(1000);
-
             executerManager.AbortAll();
             executerManager.WaitAll();
         }
-
         [TestMethod]
         public void TestDispose()
         {
-
             ExecuterManager executerManager = new ExecuterManager(); // Create container
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
@@ -223,16 +189,11 @@ namespace TestProject
                 @"D:\STORE_EXEC\TEST_MANAGEMED_APP"); executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task2", "", OnProcessCallBack,
               @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
             Thread.Sleep(1000);
-
             executerManager.Dispose();
-         
         }
-
-
         [TestMethod]
         public void TestUsingDispose()
         {
-
             using (ExecuterManager executerManager = new ExecuterManager())
             {
                 executerManager.OnProcessExit = OnExitCallbackFunction;
@@ -244,9 +205,7 @@ namespace TestProject
                     @"D:\STORE_EXEC\TEST_MANAGEMED_APP"); executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task2", "", OnProcessCallBack,
                   @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
                 Thread.Sleep(1000);
-
             }
-
         }
     }
 }

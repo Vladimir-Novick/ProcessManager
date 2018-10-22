@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime;
+using System.Threading;
 using System.Threading.Tasks;
 /*
 Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick ,
@@ -19,13 +21,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-namespace RemoteProcessManagerLib.Runner
+namespace ProcessManagerLib.Runner
 {
-    public class ExecItemStatus
+    public class Utils
     {
-        public DateTime Start { get; set; }
-        public String Name { get; set; }
-        public String Description { get; set; }
-        public TaskStatus Status { get; set; }
+        public static Task MemoryCleaner;
+        private static void SetCompact(int DeltaTime)
+        {
+            MemoryCleaner = new Task(() =>
+              {
+                  try
+                  {
+                      while (true)
+                      {
+                          try
+                          {
+                              GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+                              GC.Collect();
+                          }
+                          catch (Exception ex)
+                          {
+                          }
+                          Thread.Sleep(DeltaTime);
+                      }
+                  }
+                  catch (Exception) { }
+              });
+        }
     }
 }

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Version>2.0.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Vladimir Novick, vlad.novick@gmail.com</Authors>
+    <Company>Vladimir Novick,</Company>
+    <Description>The Process Manager library provides the launch multiple asynchronous processes and provides information about their statuses. Provides running multiple external console program as hidden</Description>
+    <Copyright>Vladimir Novick, vlad.novick@gmail.com</Copyright>
+    <PackageProjectUrl>https://github.com/Vladimir-Novick/ProcessManager</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Vladimir-Novick/ProcessManager</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>doc\</OutputPath>
+    <DocumentationFile>doc\ProcessManagerLib.xml</DocumentationFile>
+  </PropertyGroup>
+
+</Project>

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Runtime;
-using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 /*
 Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick ,
@@ -21,32 +21,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-namespace RemoteProcessManagerLib.Runner
+namespace ProcessManagerLib.Runner
 {
-    public class Utils
+    /// <summary>
+    ///  An environment variable is a dynamic-named value that can affect the way running processes . 
+    ///  They are part of the environment in which a process runs.
+    ///  Default - System environment variable
+    /// </summary>
+    public class EnvironmentVariable
     {
-        public static Task MemoryCleaner;
-        private static void SetCompact(int DeltaTime)
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public EnvironmentVariable(String _Name, String _Value)
         {
-            MemoryCleaner = new Task(() =>
-              {
-                  try
-                  {
-                      while (true)
-                      {
-                          try
-                          {
-                              GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-                              GC.Collect();
-                          }
-                          catch (Exception ex)
-                          {
-                          }
-                          Thread.Sleep(DeltaTime);
-                      }
-                  }
-                  catch (Exception) { }
-              });
+            Name = _Name;
+            Value = _Value;
         }
     }
 }

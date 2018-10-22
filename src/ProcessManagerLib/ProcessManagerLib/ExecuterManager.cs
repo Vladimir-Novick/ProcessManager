@@ -9,6 +9,7 @@ using System.Diagnostics;
 /*
 Copyright (C) 2016-2018 by Vladimir Novick http://www.linkedin.com/in/vladimirnovick ,
 vlad.novick@gmail.com , http://www.sgcombo.com , https://github.com/Vladimir-Novick
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -25,14 +26,23 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-namespace RemoteProcessManagerLib.Runner
+namespace ProcessManagerLib.Runner
 {
     /// <summary>
     ///    Running multiple processes asynchronously
     /// </summary>
-    public class ExecuterManager : IDisposable
+    public class ProcessManager : IDisposable
     {
         bool disposed = false;
+
+        /// <summary>
+        ///  Destructor
+        /// </summary>
+         ~ProcessManager()
+        {
+            Dispose(true);
+        }
+
         /// <summary>
         ///    Dispose method to release unmanaged resources used by your application.
         ///    Abort all running process on the container
@@ -197,7 +207,7 @@ namespace RemoteProcessManagerLib.Runner
         /// <summary>
         ///   Default Constructor.
         /// </summary>
-        public ExecuterManager()
+        public ProcessManager()
         {
             OnProcessExit = OnExitFunction;
         }

@@ -6,15 +6,15 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.1": {
-      "RemoteProcessManagerLib/1.0.0": {
+      "ProcessManagerLib/2.0.0": {
         "runtime": {
-          "RemoteProcessManagerLib.dll": {}
+          "ProcessManagerLib.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "RemoteProcessManagerLib/1.0.0": {
+    "ProcessManagerLib/2.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RemoteProcessManagerLib.Runner;
+using ProcessManagerLib.Runner;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -53,7 +53,7 @@ namespace TestProject
         [TestMethod]
         public void RunExecCommand()
         {
-            ExecuterManager executerManager = new ExecuterManager(); // Create container
+            ProcessManager executerManager = new ProcessManager(); // Create container
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec("CHECK DIR", "dir.exe", "*.*");
             executerManager.WaitAll(); // wait all process
@@ -61,7 +61,7 @@ namespace TestProject
         [TestMethod]
         public void RunExecCommandWithCallback()
         {
-            ExecuterManager executerManager = new ExecuterManager(); // Create container
+            ProcessManager executerManager = new ProcessManager(); // Create container
             executerManager.RunExec("CHECK DIR", @"cmd.exe", @"/c dir *.*", "", OnProcessCallBack, @"C:\Windows\System32");
             executerManager.WaitAll(); // wait all process
         }
@@ -71,7 +71,7 @@ namespace TestProject
         [TestMethod]
         public void RunConsoleApplication()
         {
-            ExecuterManager executerManager = new ExecuterManager(); // Create container
+            ProcessManager executerManager = new ProcessManager(); // Create container
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
                 @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
@@ -82,7 +82,7 @@ namespace TestProject
         [TestMethod]
         public void AbortProcess()
         {
-            ExecuterManager executerManager = new ExecuterManager(); // Create container
+            ProcessManager executerManager = new ProcessManager(); // Create container
             String ProcessID = Guid.NewGuid().ToString();
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
@@ -94,7 +94,7 @@ namespace TestProject
         [TestMethod]
         public void GetProcessInfo()
         {
-            ExecuterManager executerManager = new ExecuterManager(); // Create container
+            ProcessManager executerManager = new ProcessManager(); // Create container
             String ProcessID = Guid.NewGuid().ToString();
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
@@ -110,7 +110,7 @@ namespace TestProject
         [TestMethod]
         public void GetProcessMemory()
         {
-            ExecuterManager executerManager = new ExecuterManager(); // Create container
+            ProcessManager executerManager = new ProcessManager(); // Create container
             String ProcessID = Guid.NewGuid().ToString();
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
@@ -123,7 +123,7 @@ namespace TestProject
         [TestMethod]
         public void WaitAllProcess()
         {
-            ExecuterManager executerManager = new ExecuterManager(); // Create container
+            ProcessManager executerManager = new ProcessManager(); // Create container
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
                 @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
@@ -144,7 +144,7 @@ namespace TestProject
         [TestMethod]
         public void GetLatestMessage()
         {
-            ExecuterManager executerManager = new ExecuterManager(); // Create container
+            ProcessManager executerManager = new ProcessManager(); // Create container
             String ProcessID = Guid.NewGuid().ToString();
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(ProcessID, "TEST_MANAGEMED_APP.exe", "Process1", "", OnProcessCallBack,
@@ -163,7 +163,7 @@ namespace TestProject
         [TestMethod]
         public void AbortAll()
         {
-            ExecuterManager executerManager = new ExecuterManager(); // Create container
+            ProcessManager executerManager = new ProcessManager(); // Create container
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
                 @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
@@ -179,7 +179,7 @@ namespace TestProject
         [TestMethod]
         public void TestDispose()
         {
-            ExecuterManager executerManager = new ExecuterManager(); // Create container
+            ProcessManager executerManager = new ProcessManager(); // Create container
             executerManager.OnProcessExit = OnExitCallbackFunction;
             executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,
                 @"D:\STORE_EXEC\TEST_MANAGEMED_APP");
@@ -194,7 +194,7 @@ namespace TestProject
         [TestMethod]
         public void TestUsingDispose()
         {
-            using (ExecuterManager executerManager = new ExecuterManager())
+            using (ProcessManager executerManager = new ProcessManager())
             {
                 executerManager.OnProcessExit = OnExitCallbackFunction;
                 executerManager.RunExec(Guid.NewGuid().ToString(), "TEST_MANAGEMED_APP.exe", "task1", "", OnProcessCallBack,

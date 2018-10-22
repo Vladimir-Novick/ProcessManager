@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteProcessManagerLib", "RemoteProcessManagerLib\RemoteProcessManagerLib.csproj", "{01C6FB00-E9A8-4BB1-9155-C074112AF5FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManagerLib", "ProcessManagerLib\ProcessManagerLib.csproj", "{01C6FB00-E9A8-4BB1-9155-C074112AF5FE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject", "TestProject\TestProject.csproj", "{62E0D228-6469-466F-A20F-C9F34454C611}"
 EndProject
